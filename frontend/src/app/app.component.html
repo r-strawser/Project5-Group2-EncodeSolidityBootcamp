@@ -8,11 +8,20 @@
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li *ngIf="!wallet" class="nav-item">
-            <a href="#" class="nav-link active" aria-current="page">
+            <a (click)="createWallet()" href="#" class="nav-link btn btn-info" aria-current="page">
                 <svg class="bi me-2" width="16" height="16">
                     <use xlink:href="#home"></use>
                 </svg>
-                Connect Wallet
+                Create Wallet
+            </a>
+        </li>
+        <li *ngIf="!wallet" class="nav-item">
+            <a href="#" class="nav-link btn btn-success" aria-current="page" data-bs-toggle="modal"
+                data-bs-target="#importWallet">
+                <svg class="bi me-2" width="16" height="16">
+                    <use xlink:href="#home"></use>
+                </svg>
+                Import Wallet
             </a>
         </li>
         <li *ngIf="wallet">
@@ -63,4 +72,38 @@
 
         <button class="btn btn-lg btn-primary btn-block" type="submit">Submit offer</button>
     </form>
+</div>
+
+<!--- IMPORT WALLET MODAL --->
+<div class="modal fade" id="importWallet" tabindex="-1" aria-labelledby="importWalletLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importWalletLabel">Wallet Import</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">(Make sure no thieves are looking)
+                <div class="input-group mt-4">
+                    <input #inputMnemonic type="text" class="form-control"
+                        placeholder="Enter your mnumonic seed phrase">
+                    <div class="input-group-append">
+                        <button class="btn btn-success" data-bs-dismiss="modal" type="button"
+                            (click)="importWallet(inputMnemonic.value, 'mnemonic')">Via Mnemonic</button>
+                    </div>
+                </div>
+                <div class="input-group mt-4">
+                    <input #inputPrivateKey type="text"
+                        value='73ca93ab7a1bd9a844c8efcff7141a54c423a333f83fd7e2d4bb28be22f6a7a8' class="form-control"
+                        placeholder="Enter your private key">
+                    <div class="input-group-append">
+                        <button class="btn btn-success" data-bs-dismiss="modal" type="button"
+                            (click)="importWallet(inputPrivateKey.value, 'privatekey')">Via Private Key</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
 </div>
