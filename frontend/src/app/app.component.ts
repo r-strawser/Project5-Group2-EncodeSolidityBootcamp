@@ -14,5 +14,5 @@ export class requestTokensDTO {
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-
+    wallet: string | undefined;
 }
