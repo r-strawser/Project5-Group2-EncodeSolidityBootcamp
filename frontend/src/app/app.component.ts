@@ -35,9 +35,7 @@ export class AppComponent {
     votePower: number | string | undefined;
 
     lotteryBetsOpen: boolean | string | undefined;
-    lotteryWinningProposal: number | string | undefined;
-    lotteryWinnerName: string | undefined;
-    lotteryWinningVotes: number | string | undefined;
+    lotteryBetPrice: number | string | undefined;
 
     backendUrl: string | undefined;
     tokenContractAddress: string | undefined;
@@ -100,9 +98,7 @@ export class AppComponent {
             'loading...'
         ];
 
-        [this.lotteryBetsOpen, this.lotteryWinningProposal, this.lotteryWinnerName, this.lotteryWinningVotes] = [
-            'loading...',
-            'loading...',
+        [this.lotteryBetsOpen, this.lotteryBetPrice] = [
             'loading...',
             'loading...'
         ];
@@ -119,12 +115,24 @@ export class AppComponent {
 
             // check the state of the lottery contract
             if (this.lotteryContract) {
-                // check the bets status to see if it is true or false
-                this.lotteryContract['betsOpen']().then(
-                    (betsOpenStatus: string) => {
-                        this.lotteryBetsOpen = betsOpenStatus;
+                if (this.lotteryContract['betsOpen'] != undefined && this.lotteryContract['betsOpen'] != null) {
+                    console.log('betsOpen');
+                    this.lotteryContract['betsOpen'].then(
+                    (betsOpenStatus: boolean) => {
+                        console.log({betsOpenStatus});
+                    this.lotteryBetsOpen = betsOpenStatus.toString();
+                    }
+                    );
+                }
+
+                // 
+                this.lotteryContract['betPrice'].then(
+                    (betPriceBN: ethers.BigNumberish) => {
+                        console.log({betPriceBN});
+                        this.lotteryBetPrice = parseFloat(ethers.utils.formatEther(betPriceBN));
                     }
                 );
+
             }
             
             // read from the public boolean 'betsOpen' variable and set the value of the lotteryBetsOpen variable
@@ -223,8 +231,6 @@ export class AppComponent {
             this.lotteryContract['closeLottery']().then(this.updateValues());
             console.log('you are done with closing the lottery');
         }
-        // const receipt = await tx.wait();
-        // console.log(`Bets closed (${receipt.transactionHash})\n`);
     }
 
     vote(proposal: number | string, amount: number | string) {
