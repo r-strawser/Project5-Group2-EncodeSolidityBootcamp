@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ethers } from 'ethers';
-import tokenJson from '../assets/Lottery.json'
-import ballotJson from '../assets/LotteryToken.json'
+import lotteryJson from '../assets/Lottery.json'
+import tokenJson from '../assets/LotteryToken.json'
 
 export class requestTokensDTO {
     constructor(public address: string, public amount: string) { }
@@ -23,22 +23,22 @@ export class AppComponent {
     // token contract object
     tokenContract: ethers.Contract | undefined;
 
-    // ballot contract object
-    ballotContract: ethers.Contract | undefined;
+    // lottery contract object
+    lotteryContract: ethers.Contract | undefined;
 
 
     ethBalance: number | string | undefined;
     tokenBalance: number | string | undefined;
     votePower: number | string | undefined;
 
-    ballotVotePower: number | string | undefined;
-    ballotWinningProposal: number | string | undefined;
-    ballotWinnerName: string | undefined;
-    ballotWinningVotes: number | string | undefined;
+    lotteryVotePower: number | string | undefined;
+    lotteryWinningProposal: number | string | undefined;
+    lotteryWinnerName: string | undefined;
+    lotteryWinningVotes: number | string | undefined;
 
     backendUrl: string | undefined;
     tokenContractAddress: string | undefined;
-    ballotContractAddress: string | undefined;
+    lotteryContractAddress: string | undefined;
 
     tokenRequestPending: boolean;
     errorMsg: string | undefined;
@@ -47,8 +47,8 @@ export class AppComponent {
     k_historicalDataWallet: string[] | undefined;
     historicalDataToken: any | undefined;
     k_historicalDataToken: string[] | undefined;
-    historicalDataBallot: any | undefined;
-    k_historicalDataBallot: string[] | undefined;
+    historicalDataLottery: any | undefined;
+    k_historicalDataLottery: string[] | undefined;
 
     constructor(private http: HttpClient) {
         // set the provider object
@@ -59,8 +59,8 @@ export class AppComponent {
             this.tokenContractAddress = ans.result;
         })
 
-        // this.http.get<any>(`${this.backendUrl}/get-ballot-contract-address`).subscribe((ans) => {
-        //   this.ballotContractAddress = ans.result;
+        // this.http.get<any>(`${this.backendUrl}/get-lottery-contract-address`).subscribe((ans) => {
+        //   this.lotteryContractAddress = ans.result;
         // })
 
         this.tokenRequestPending = false;
@@ -72,9 +72,9 @@ export class AppComponent {
         }
     }
 
-    connectBallotContract(address: string) {
-        this.ballotContractAddress = address;
-        this.ballotContract = new ethers.Contract(this.ballotContractAddress, ballotJson.abi, this.wallet);
+    connectLotteryContract(address: string) {
+        this.lotteryContractAddress = address;
+        this.lotteryContract = new ethers.Contract(this.lotteryContractAddress, lotteryJson.abi, this.wallet);
 
         this.updateValues();
     }
@@ -94,7 +94,7 @@ export class AppComponent {
             'loading...'
         ];
 
-        [this.ballotVotePower, this.ballotWinningProposal, this.ballotWinnerName, this.ballotWinningVotes] = [
+        [this.lotteryVotePower, this.lotteryWinningProposal, this.lotteryWinnerName, this.lotteryWinningVotes] = [
             'loading...',
             'loading...',
             'loading...',
@@ -115,27 +115,27 @@ export class AppComponent {
                     }
                 );
             }
-            if (this.ballotContract) {
-                this.ballotContract['votePower'](this.wallet?.address).then(
-                    (ballotVotePowerBN: ethers.BigNumberish) => {
-                        this.ballotVotePower = parseFloat(ethers.utils.formatEther(ballotVotePowerBN));
+            if (this.lotteryContract) {
+                this.lotteryContract['votePower'](this.wallet?.address).then(
+                    (lotteryVotePowerBN: ethers.BigNumberish) => {
+                        this.lotteryVotePower = parseFloat(ethers.utils.formatEther(lotteryVotePowerBN));
                     }
                 );
-                this.ballotContract['winningProposal']().then(
-                    (ballotWinningProposal: number) => {
-                        this.ballotWinningProposal = ballotWinningProposal;
-                        if (this.ballotContract) {
-                            this.ballotContract['proposals'](this.ballotWinningProposal).then((ballotWinningVotes: any) => {
-                                console.log(ballotWinningVotes.voteCount)
-                                this.ballotWinningVotes = ballotWinningVotes.voteCount;
+                this.lotteryContract['winningProposal']().then(
+                    (lotteryWinningProposal: number) => {
+                        this.lotteryWinningProposal = lotteryWinningProposal;
+                        if (this.lotteryContract) {
+                            this.lotteryContract['proposals'](this.lotteryWinningProposal).then((lotteryWinningVotes: any) => {
+                                console.log(lotteryWinningVotes.voteCount)
+                                this.lotteryWinningVotes = lotteryWinningVotes.voteCount;
                             })
                         }
                     }
                 );
-                this.ballotContract['winnerName']().then(
-                    (ballotWinnerName: string) => {
-                        // convert ballotWinnerName to string
-                        this.ballotWinnerName = ethers.utils.parseBytes32String(ballotWinnerName);
+                this.lotteryContract['winnerName']().then(
+                    (lotteryWinnerName: string) => {
+                        // convert lotteryWinnerName to string
+                        this.lotteryWinnerName = ethers.utils.parseBytes32String(lotteryWinnerName);
                     }
                 );
             }
@@ -143,11 +143,11 @@ export class AppComponent {
 
         this.historicalDataWallet = await this.getHistoricalData(this.wallet?.address ?? "");
         this.historicalDataToken = await this.getHistoricalData(this.tokenContractAddress ?? "");
-        this.historicalDataBallot = await this.getHistoricalData(this.ballotContractAddress ?? "");
+        this.historicalDataLottery = await this.getHistoricalData(this.lotteryContractAddress ?? "");
 
         this.k_historicalDataWallet = Object.keys(this.historicalDataWallet[0]) ?? undefined;
         this.k_historicalDataToken = Object.keys(this.historicalDataToken[0]) ?? undefined;
-        this.k_historicalDataBallot = Object.keys(this.historicalDataBallot[0]) ?? undefined;
+        this.k_historicalDataLottery = Object.keys(this.historicalDataLottery[0]) ?? undefined;
     }
 
     importWallet(secret: string, importMethod: string) {
@@ -202,10 +202,10 @@ export class AppComponent {
     }
 
     vote(proposal: number | string, amount: number | string) {
-        console.log(`you are using ballot contract ${this.ballotContractAddress} and ${amount} vote power to vote towards proposal ${proposal}`);
-        if (this.ballotContract) {
-            console.log(`there is a ballot contract of address ${this.ballotContract.address} and you are inside the if about to vote`);
-            this.ballotContract['vote'](proposal, amount).then(this.updateValues());
+        console.log(`you are using lottery contract ${this.lotteryContractAddress} and ${amount} vote power to vote towards proposal ${proposal}`);
+        if (this.lotteryContract) {
+            console.log(`there is a lottery contract of address ${this.lotteryContract.address} and you are inside the if about to vote`);
+            this.lotteryContract['vote'](proposal, amount).then(this.updateValues());
             console.log('you are done with voting');
         }
     }
@@ -246,5 +246,9 @@ export class AppComponent {
             return `${data.slice(0, 3)}...${data.slice(-3)}`
         }
         return data
+    }
+
+    async deployLotteryContract() {
+
     }
 }
