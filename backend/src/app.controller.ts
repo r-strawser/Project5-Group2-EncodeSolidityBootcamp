@@ -9,4 +9,14 @@ export class requestTokensDTO {
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) { }
+
+  @Get("get-token-contract-address")
+  getTokenContractAddress(): any {
+    return this.appService.getTokenContractAddress();
+  }
+
+  @Post("request-tokens")
+  requestTokens(@Body() body: requestTokensDTO): any {
+    return this.appService.requestTokens(body.address, body.amount);
+  }
 }

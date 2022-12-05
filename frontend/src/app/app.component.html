@@ -1,78 +1,254 @@
-<div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 280px; height: 100%; position: absolute">
-    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-        <svg class="bi me-2" width="40" height="32">
-            <use xlink:href="#bootstrap"></use>
-        </svg>
-        <span class="fs-4">Wallet</span>
-    </a>
-    <hr>
-    <ul class="nav nav-pills flex-column mb-auto">
-        <li *ngIf="!wallet" class="nav-item">
-            <a (click)="createWallet()" href="#" class="nav-link btn btn-info" aria-current="page">
-                <svg class="bi me-2" width="16" height="16">
-                    <use xlink:href="#home"></use>
-                </svg>
-                Create Wallet
-            </a>
-        </li>
-        <li *ngIf="!wallet" class="nav-item">
-            <a href="#" class="nav-link btn btn-success" aria-current="page" data-bs-toggle="modal"
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold">Tokenized Ballot DApp</h1>
+
+    <div class="col-lg-6 mx-auto">
+        <div *ngIf="!wallet" class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <button (click)="createWallet()" type="button" class="btn btn-success btn-lg px-4 gap-3">Create Wallet
+            </button>
+            <button type="button" class="btn btn-primary btn-lg px-4 gap-3" data-bs-toggle="modal"
                 data-bs-target="#importWallet">
-                <svg class="bi me-2" width="16" height="16">
-                    <use xlink:href="#home"></use>
-                </svg>
                 Import Wallet
-            </a>
-        </li>
-        <li *ngIf="wallet">
-            <a href="#" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16">
-                    <use xlink:href="#speedometer2"></use>
-                </svg>
-                Disconnect
-            </a>
-        </li>
-        <li *ngIf="wallet">
-            <a href="#" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16">
-                    <use xlink:href="#table"></use>
-                </svg>
-                Refresh
-            </a>
-        </li>
-        <li *ngIf="wallet">
-            <a href="#" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16">
-                    <use xlink:href="#grid"></use>
-                </svg>
+            </button>
+            <button (click)="connectWallet()" type="button" class="btn btn-danger btn-lg px-4 gap-3" disabled>Connect
+                Wallet </button>
+        </div>
+
+
+        <div *ngIf="wallet">
+            <div class="card border-0">
+                <div class="card-body">
+                    <h4 class="card-title">Wallet Address</h4>
+                    <h6><a href='https://goerli.etherscan.io/address/{{wallet.address}}' target="_blank">View on
+                            Etherscan</a></h6>
+                    <p class="card-text">
+                        {{wallet.address}}
+                        <button (click)="disconnectWallet()" type="button" class="btn btn-danger">
+                            Disconnect
+                        </button>
+                    </p>
+
+                </div>
+            </div>
+            <div class="card border-0">
+                <div class="card-body">
+                    <h4 class="card-title">Token Contract</h4>
+                    <h6><a href='https://goerli.etherscan.io/address/{{tokenContractAddress}}' target="_blank">View on
+                            Etherscan</a></h6>
+                    <p class="card-text">
+                        {{tokenContractAddress}}
+                    </p>
+                </div>
+            </div>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Your ETH Balance</h4>
+                        <p class="card-text">
+                            {{ethBalance}}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Your token Balance</h4>
+                        <p class="card-text">
+                            {{tokenBalance}}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Your Votes:</h4>
+                        <p class="card-text">
+                            {{votePower}}
+                        </p>
+                    </div>
+                </div>
+                <button (click)="updateValues()" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                        <path
+                            d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+                    </svg>
+                </button>
+            </div>
+            <button [disabled]="tokenRequestPending" (click)="requestTokensTen()" type="button"
+                class="btn btn-success btn-lg px-4 m-3 gap-3">
                 Request Tokens
-            </a>
-        </li>
-        <li *ngIf="wallet">
-            <a href="#" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16">
-                    <use xlink:href="#people-circle"></use>
-                </svg>
+            </button>
+            <button type="button" class="btn btn-primary btn-lg px-4 m-3 gap-3" data-bs-toggle="modal"
+                data-bs-target="#transferTokens">
                 Transfer Tokens
-            </a>
-        </li>
-    </ul>
+            </button>
+            <button type="button" class="btn btn-primary btn-lg px-4 m-3 gap-3" data-bs-toggle="modal"
+                data-bs-target="#delegateTokens">
+                Self Delegate
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="wallet" class="container my-4 text-center">
+        <div class="row justify-content-center my-4">
+            <div class="my-4">
+                <div class="container border rounded m-4">
+                    <div *ngIf="!ballotContractAddress" class="row m-4">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Address</span>
+                            <input #ballotContractAddress type="text" class="form-control"
+                                placeholder="Ballot contract address here">
+                            <button (click)="connectBallotContract(ballotContractAddress.value)"
+                                class="btn btn-success input-group-button">Connect</button>
+                        </div>
+                    </div>
+
+                    <div *ngIf="ballotContractAddress" class="row m-4">
+                        <p>Ballot contract address: {{ballotContractAddress}}</p>
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Voting Power</h4>
+                                    <p class="card-text">
+                                        {{ballotVotePower}}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Winning Proposal: </h4>
+                                    <p class="card-text">
+                                        {{ballotWinningProposal}}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Winner Name: </h4>
+                                    <p class="card-text">
+                                        {{ballotWinnerName}}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Winning Votes: </h4>
+                                    <p class="card-text">
+                                        {{ballotWinningVotes}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger btn-lg px-4 m-3 gap-3" data-bs-toggle="modal"
+                            data-bs-target="#vote">
+                            Vote
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <hr>
+    <div class="container">
+        <ul class="nav nav-pills nav-fill" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="wallet-tab" data-bs-toggle="tab" data-bs-target="#wallet-tab-pane"
+                    type="button" role="tab" aria-controls="wallet-tab-pane" aria-selected="true">Wallet Txs</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="token-tab" data-bs-toggle="tab" data-bs-target="#token-tab-pane"
+                    type="button" role="tab" aria-controls="token-tab-pane" aria-selected="false">Token Txs</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="ballot-tab" data-bs-toggle="tab" data-bs-target="#ballot-tab-pane"
+                    type="button" role="tab" aria-controls="ballot-tab-pane" aria-selected="false">Ballot Txs</button>
+            </li>
+        </ul>
+        <div class="tab-content my-4" id="myTabContent">
+            <div class="tab-pane fade show active" id="wallet-tab-pane" role="tabpanel" aria-labelledby="wallet-tab"
+                tabindex="0">
+                <div *ngIf="!historicalDataWallet || !k_historicalDataWallet">
+                    Nothing to show here yet. Connect a wallet or a contract or perform some transaction on them to see
+                    history here.
+                </div>
+                <div *ngIf="historicalDataWallet" class="container">
+                    <table class="table thead-dark table-bordered table-hover table-responsive">
+                        <thead>
+                            <tr>
+                                <th *ngFor=" let key of k_historicalDataWallet" scope="col">
+                                    {{key}}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor=" let res of historicalDataWallet">
+                                <td *ngFor=" let key of k_historicalDataWallet">
+                                    {{res[key]}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="token-tab-pane" role="tabpanel" aria-labelledby="token-tab" tabindex="0">
+                <div *ngIf="!historicalDataToken || !k_historicalDataToken">
+                    Nothing to show here yet. Connect a wallet or a contract or perform some transaction on them to see
+                    history here.
+                </div>
+                <div *ngIf="historicalDataToken" class="container">
+                    <table class="table thead-dark table-bordered table-hover table-responsive">
+                        <thead>
+                            <tr>
+                                <th *ngFor=" let key of k_historicalDataToken" scope="col">
+                                    {{key}}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor=" let res of historicalDataToken">
+                                <td *ngFor=" let key of k_historicalDataToken">
+                                    {{res[key]}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="ballot-tab-pane" role="tabpanel" aria-labelledby="ballot-tab" tabindex="0">
+                <div *ngIf="!historicalDataBallot || !k_historicalDataBallot">
+                    Nothing to show here yet. Connect a wallet or a contract or perform some transaction on them to see
+                    history here.
+                </div>
+                <div *ngIf="historicalDataBallot" class="container">
+                    <table class="table thead-dark table-bordered table-hover table-responsive">
+                        <thead>
+                            <tr>
+                                <th *ngFor=" let key of k_historicalDataBallot" scope="col">
+                                    {{key}}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor=" let res of historicalDataBallot">
+                                <td *ngFor=" let key of k_historicalDataBallot">
+                                    {{res[key]}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="container my-4" style="padding-left:280px; padding-top: 50px;">
-    <form class="form-signin">
-        <div class="text-center mb-4">
-            <h1 class="h3 mb-3 font-weight-normal">Feeling lucky?</h1>
-        </div>
 
-        <div class="form-label-group mb-4">
-            <input type="number" id="inputTokens" class="form-control" placeholder="# tokens" required="" autofocus="">
-        </div>
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Submit offer</button>
-    </form>
-</div>
 
 <!--- IMPORT WALLET MODAL --->
 <div class="modal fade" id="importWallet" tabindex="-1" aria-labelledby="importWalletLabel" aria-hidden="true">
@@ -107,3 +283,113 @@
         </div>
     </div>
 </div>
+
+<!--- TRANSFER TOKENS MODAL --->
+<div class="modal fade" id="transferTokens" tabindex="-1" aria-labelledby="transferTokensLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transferTokensLabel">Transfer Tokens</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">(It's their lucky day)
+                <div class="input-group mt-4">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text pe-1">Transfer To</div>
+                    </div>
+                    <input #inputTransferTo type="text" class="form-control" placeholder="Enter receiver's address">
+                </div>
+                <div class="input-group mt-4">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text pe-4 ps-4">Amount </div>
+                    </div>
+                    <input #inputTransferAmount type="number" min='0' value='' class="form-control"
+                        placeholder="Enter amount to Transfer">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                    (click)="transferTokens(inputTransferTo.value, inputTransferAmount.value)">
+                    Transfer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--- DELEGATE TOKENS MODAL --->
+<div *ngIf="wallet" class="modal fade" id="delegateTokens" tabindex="-1" aria-labelledby="delegateTokensLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delegateTokensLabel">Delegate Tokens</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">(So you want to try some governance?)
+                <div class="input-group mt-4">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text pe-1">Delegate To</div>
+                    </div>
+                    <input #inputDelegateTo type="text" class="form-control" value='{{wallet.address}}'
+                        placeholder="Enter delegates address" disabled>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                    (click)="delegateTokens(inputDelegateTo.value)">
+                    Delegate
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--- VOTE MODAL --->
+<div class="modal fade" id="vote" tabindex="-1" aria-labelledby="voteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="voteLabel">Vote</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mt-4">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text pe-4 ps-4">Proposal </div>
+                    </div>
+                    <input #inputProposal type="text" min='0' value='' class="form-control"
+                        placeholder="Enter proposal index">
+                </div>
+                <div class="input-group mt-4">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text pe-4 ps-4">Amount </div>
+                    </div>
+                    <input #inputVoteAmount type="text" min='0' value='' class="form-control"
+                        placeholder="Enter amount to vote">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                    (click)="vote(inputProposal.value, inputVoteAmount.value)">
+                    Vote
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Connect wallet-->
+<!-- Show eth balance, token balance, vote power -->
+<!-- input for ballot contract or token contract-->
+<!-- if token buttons for request, transfer-->
+<!-- form for request -->
+<!-- form for transfer -->
+<!-- if ballot buttons for vote, delegate, result-->
+<!-- form for vote -->
+<!-- form for delegate -->
+<!-- button to clear contract related actions -->
+<!-- button to disconnect wallet -->

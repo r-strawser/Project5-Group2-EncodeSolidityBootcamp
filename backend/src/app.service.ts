@@ -7,5 +7,18 @@ import { tokenContractAddress } from "./constants";
 
 @Injectable()
 export class AppService {
+  getTokenContractAddress() {
+    return { result: tokenContractAddress }
+  }
+
+  async requestTokens(address, amount) {
+    const signer = await SetupSigner();
+    const contract = new ethers.Contract(tokenContractAddress, tokenJson.abi, signer);
+
+    const mintTx = await contract.mint(address, ethers.utils.parseEther(amount));
+    const receipt = await mintTx.wait();
+
+    return { result: receipt.transactionHash };
+  }
 
 }
