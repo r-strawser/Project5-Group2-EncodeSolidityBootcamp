@@ -15,6 +15,11 @@ export class AppController {
     return this.appService.getTokenContractAddress();
   }
 
+  @Get("get-lottery-contract-address")
+  getLotteryContractAddress(): any {
+    return this.appService.getLotteryContractAddress();
+  }
+
   @Post("request-tokens")
   requestTokens(@Body() body: requestTokensDTO): any {
     return this.appService.requestTokens(body.address, body.amount);
