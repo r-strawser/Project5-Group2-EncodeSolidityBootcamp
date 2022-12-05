@@ -8,6 +8,9 @@ export class requestTokensDTO {
     constructor(public address: string, public amount: string) { }
 }
 
+const lotteryAddress: string = '0xA520E49A056D9eB838d9c5D316c636B03B11Dad9';
+const tokenAddress: string = '0x37C33e20d4766F84e1a18053519Aa2BA66bF0D4a'
+
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
@@ -31,7 +34,7 @@ export class AppComponent {
     tokenBalance: number | string | undefined;
     votePower: number | string | undefined;
 
-    lotteryVotePower: number | string | undefined;
+    lotteryBetsOpen: boolean | string | undefined;
     lotteryWinningProposal: number | string | undefined;
     lotteryWinnerName: string | undefined;
     lotteryWinningVotes: number | string | undefined;
@@ -58,6 +61,9 @@ export class AppComponent {
         this.http.get<any>(`${this.backendUrl}/get-token-contract-address`).subscribe((ans) => {
             this.tokenContractAddress = ans.result;
         })
+        
+        this.tokenContractAddress = tokenAddress;
+        this.lotteryContractAddress = lotteryAddress;
 
         // this.http.get<any>(`${this.backendUrl}/get-lottery-contract-address`).subscribe((ans) => {
         //   this.lotteryContractAddress = ans.result;
@@ -94,7 +100,7 @@ export class AppComponent {
             'loading...'
         ];
 
-        [this.lotteryVotePower, this.lotteryWinningProposal, this.lotteryWinnerName, this.lotteryWinningVotes] = [
+        [this.lotteryBetsOpen, this.lotteryWinningProposal, this.lotteryWinnerName, this.lotteryWinningVotes] = [
             'loading...',
             'loading...',
             'loading...',
@@ -109,36 +115,45 @@ export class AppComponent {
                         this.tokenBalance = parseFloat(ethers.utils.formatEther(balanceBN));
                     }
                 );
-                this.tokenContract['getVotes'](this.wallet?.address).then(
-                    (votePowerBN: ethers.BigNumberish) => {
-                        this.votePower = parseFloat(ethers.utils.formatEther(votePowerBN));
-                    }
-                );
             }
+
+            // check the bets status to see if it is true or false
             if (this.lotteryContract) {
-                this.lotteryContract['votePower'](this.wallet?.address).then(
-                    (lotteryVotePowerBN: ethers.BigNumberish) => {
-                        this.lotteryVotePower = parseFloat(ethers.utils.formatEther(lotteryVotePowerBN));
-                    }
-                );
-                this.lotteryContract['winningProposal']().then(
-                    (lotteryWinningProposal: number) => {
-                        this.lotteryWinningProposal = lotteryWinningProposal;
-                        if (this.lotteryContract) {
-                            this.lotteryContract['proposals'](this.lotteryWinningProposal).then((lotteryWinningVotes: any) => {
-                                console.log(lotteryWinningVotes.voteCount)
-                                this.lotteryWinningVotes = lotteryWinningVotes.voteCount;
-                            })
-                        }
-                    }
-                );
-                this.lotteryContract['winnerName']().then(
-                    (lotteryWinnerName: string) => {
-                        // convert lotteryWinnerName to string
-                        this.lotteryWinnerName = ethers.utils.parseBytes32String(lotteryWinnerName);
+                this.lotteryContract['betsOpen']().then(
+                    (betsOpenStatus: boolean) => {
+                        this.lotteryBetsOpen = betsOpenStatus;
                     }
                 );
             }
+            
+            // read from the public boolean 'betsOpen' variable and set the value of the lotteryBetsOpen variable
+            // this.lotteryBetsOpen = this.lotteryContract['betsOpen']();
+            
+
+            // if (this.lotteryContract) {
+            //     this.lotteryContract['votePower'](this.wallet?.address).then(
+            //         (lotteryVotePowerBN: ethers.BigNumberish) => {
+            //             this.lotteryVotePower = parseFloat(ethers.utils.formatEther(lotteryVotePowerBN));
+            //         }
+            //     );
+            //     this.lotteryContract['winningProposal']().then(
+            //         (lotteryWinningProposal: number) => {
+            //             this.lotteryWinningProposal = lotteryWinningProposal;
+            //             if (this.lotteryContract) {
+            //                 this.lotteryContract['proposals'](this.lotteryWinningProposal).then((lotteryWinningVotes: any) => {
+            //                     console.log(lotteryWinningVotes.voteCount)
+            //                     this.lotteryWinningVotes = lotteryWinningVotes.voteCount;
+            //                 })
+            //             }
+            //         }
+            //     );
+            //     this.lotteryContract['winnerName']().then(
+            //         (lotteryWinnerName: string) => {
+            //             // convert lotteryWinnerName to string
+            //             this.lotteryWinnerName = ethers.utils.parseBytes32String(lotteryWinnerName);
+            //         }
+            //     );
+            // }
         });
 
         this.historicalDataWallet = await this.getHistoricalData(this.wallet?.address ?? "");
