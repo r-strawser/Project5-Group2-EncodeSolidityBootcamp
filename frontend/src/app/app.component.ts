@@ -117,10 +117,11 @@ export class AppComponent {
                 );
             }
 
-            // check the bets status to see if it is true or false
+            // check the state of the lottery contract
             if (this.lotteryContract) {
+                // check the bets status to see if it is true or false
                 this.lotteryContract['betsOpen']().then(
-                    (betsOpenStatus: boolean) => {
+                    (betsOpenStatus: string) => {
                         this.lotteryBetsOpen = betsOpenStatus;
                     }
                 );
@@ -214,6 +215,16 @@ export class AppComponent {
             this.tokenContract['transfer'](to).then(this.updateValues());
             console.log('you are done with delegating');
         }
+    }
+
+    async closeLottery() {
+        console.log(`closing the lottery for contract: ${this.lotteryContractAddress}`);
+        if(this.lotteryContract) {
+            this.lotteryContract['closeLottery']().then(this.updateValues());
+            console.log('you are done with closing the lottery');
+        }
+        // const receipt = await tx.wait();
+        // console.log(`Bets closed (${receipt.transactionHash})\n`);
     }
 
     vote(proposal: number | string, amount: number | string) {
