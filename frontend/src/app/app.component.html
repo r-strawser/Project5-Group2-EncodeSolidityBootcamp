@@ -1,5 +1,5 @@
 <div class="px-4 py-5 my-5 text-center">
-    <h1 class="display-5 fw-bold">Tokenized Ballot DApp</h1>
+    <h1 class="display-5 fw-bold">Tokenized Lottery DApp</h1>
 
     <div class="col-lg-6 mx-auto">
         <div *ngIf="!wallet" class="d-grid gap-2 d-sm-flex justify-content-sm-center">
@@ -94,24 +94,26 @@
         <div class="row justify-content-center my-4">
             <div class="my-4">
                 <div class="container border rounded m-4">
-                    <div *ngIf="!ballotContractAddress" class="row m-4">
+                    <div *ngIf="!lotteryContractAddress" class="row m-4">
                         <div class="input-group mb-3">
                             <span class="input-group-text">Address</span>
-                            <input #ballotContractAddress type="text" class="form-control"
-                                placeholder="Ballot contract address here">
-                            <button (click)="connectBallotContract(ballotContractAddress.value)"
+                            <input #lotteryContractAddress type="text" class="form-control"
+                                placeholder="Lottery contract address here">
+                            <button (click)="connectLotteryContract(lotteryContractAddress.value)"
                                 class="btn btn-success input-group-button">Connect</button>
                         </div>
+                        <h1>OR</h1>
+                        <button (click)="deployLotteryContract()" class="btn btn-alert">Deploy Lottery Contract</button>
                     </div>
 
-                    <div *ngIf="ballotContractAddress" class="row m-4">
-                        <p>Ballot contract address: {{ballotContractAddress}}</p>
+                    <div *ngIf="lotteryContractAddress" class="row m-4">
+                        <p>Lottery contract address: {{lotteryContractAddress}}</p>
                         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Voting Power</h4>
                                     <p class="card-text">
-                                        {{ballotVotePower}}
+                                        {{lotteryVotePower}}
                                     </p>
                                 </div>
                             </div>
@@ -120,7 +122,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Winning Proposal: </h4>
                                     <p class="card-text">
-                                        {{ballotWinningProposal}}
+                                        {{lotteryWinningProposal}}
                                     </p>
                                 </div>
                             </div>
@@ -129,7 +131,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Winner Name: </h4>
                                     <p class="card-text">
-                                        {{ballotWinnerName}}
+                                        {{lotteryWinnerName}}
                                     </p>
                                 </div>
                             </div>
@@ -138,7 +140,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Winning Votes: </h4>
                                     <p class="card-text">
-                                        {{ballotWinningVotes}}
+                                        {{lotteryWinningVotes}}
                                     </p>
                                 </div>
                             </div>
@@ -166,8 +168,8 @@
                     type="button" role="tab" aria-controls="token-tab-pane" aria-selected="false">Token Txs</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="ballot-tab" data-bs-toggle="tab" data-bs-target="#ballot-tab-pane"
-                    type="button" role="tab" aria-controls="ballot-tab-pane" aria-selected="false">Ballot Txs</button>
+                <button class="nav-link" id="lottery-tab" data-bs-toggle="tab" data-bs-target="#lottery-tab-pane"
+                    type="button" role="tab" aria-controls="lottery-tab-pane" aria-selected="false">Lottery Txs</button>
             </li>
         </ul>
         <div class="tab-content my-4" id="myTabContent">
@@ -220,23 +222,23 @@
                     </table>
                 </div>
             </div>
-            <div class="tab-pane fade" id="ballot-tab-pane" role="tabpanel" aria-labelledby="ballot-tab" tabindex="0">
-                <div *ngIf="!historicalDataBallot || !k_historicalDataBallot">
+            <div class="tab-pane fade" id="lottery-tab-pane" role="tabpanel" aria-labelledby="lottery-tab" tabindex="0">
+                <div *ngIf="!historicalDataLottery || !k_historicalDataLottery">
                     Nothing to show here yet. Connect a wallet or a contract or perform some transaction on them to see
                     history here.
                 </div>
-                <div *ngIf="historicalDataBallot" class="container">
+                <div *ngIf="historicalDataLottery" class="container">
                     <table class="table thead-dark table-bordered table-hover table-responsive">
                         <thead>
                             <tr>
-                                <th *ngFor=" let key of k_historicalDataBallot" scope="col">
+                                <th *ngFor=" let key of k_historicalDataLottery" scope="col">
                                     {{key}}
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor=" let res of historicalDataBallot">
-                                <td *ngFor=" let key of k_historicalDataBallot">
+                            <tr *ngFor=" let res of historicalDataLottery">
+                                <td *ngFor=" let key of k_historicalDataLottery">
                                     {{res[key]}}
                                 </td>
                             </tr>
@@ -384,11 +386,11 @@
 
 <!-- Connect wallet-->
 <!-- Show eth balance, token balance, vote power -->
-<!-- input for ballot contract or token contract-->
+<!-- input for lottery contract or token contract-->
 <!-- if token buttons for request, transfer-->
 <!-- form for request -->
 <!-- form for transfer -->
-<!-- if ballot buttons for vote, delegate, result-->
+<!-- if lottery buttons for vote, delegate, result-->
 <!-- form for vote -->
 <!-- form for delegate -->
 <!-- button to clear contract related actions -->
